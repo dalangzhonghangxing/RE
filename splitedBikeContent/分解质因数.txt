@@ -1,0 +1,72 @@
+leammaSummary 
+ 每个 合数 都 可以 写成 几个 质数 相乘 的 形式 ， 其中 每个 质数 都 是 这个 合数 的 因数 ， 叫做 这个 合数 的 分解质因数 。   分解质因数 只 针对 合数 。 
+ 定义 
+ 把 一个 合数 分解成 若干个 质因数 的 乘积 的 形式 ， 即求 质因数 的 过程 叫做 分解质因数 。 
+ 分解质因数 只 针对 合数 。 （ 分解质因数 也 称 分解 素 因数 ） 求 一个 数 分解质因数 ， 要 从 最小 的 质数 除起 ， 一直 除到 结果 为 质数 为止 。 分解质因数 的 算式 叫 短 除法 ， 和 除法 的 性质 差不多 ， 还 可以 用来 求 多个 个数 的 公因式 。 
+ 定理 
+ 不 存在 最大 质数 的 证明 ： （ 使用 反证法 ） 
+ 假设 存在 最大 的 质数 为 N ， 则 所有 的 质数 序列 为 ： N1 ， N2 ， N3 … … N 
+ 设 M = （ N1 × N2 × N3 × N4 × … … N ） + 1 ， 
+ 可以 证明 M 不能 被 任何 质数 整除 ， 得出 M 也 是 一个 质数 。 
+ 而 M > N ， 与 假设 矛盾 ， 故可 证明 不 存在 最大 的 质数 。 
+ 第二种 因数分解 的 方法 ： 
+ 1975 年 ， John   M .   Pollard 提出 。 该 算法 时间 复杂度 为 O (   ) 。 详见 参考资料 [ 1 ]   。 
+ 编程 分解 
+ program   dsq ; 　 　 var 　 　 n , i : longint ; 　 　 begin 　 　 readln ( n ) ; 　 　 write ( n , ' = 1 ' ) ; 　 　 i : = 2 ; 　 　 while   i < n   do   begin 　 　 while   n   mod   i   =   0   do   begin 　 　 write ( ' * ' , i ) ; 　 　 n : = n   div   i ; 　 　 end ; 　 　 inc ( i ) ; 　 　 end ; 　 　 end . 
+ 另 一种 实现 
+ # include   < stdio . h > 
+ Integer   m , b , c   : =   0 , j   : =   0 ; 
+ Integer   a [ 10 ] ;   / / 存放 质因数 
+ Integer   fjzys ( Integer   k ) 
+ begin 
+ Integer   i   : =   2 ; 
+ while   ( k >   : =   i )   do   / / 判断 k 是否 合格 
+ begin 
+ if   ( k   mod   i = 0 )   then   / / 判断 k 是否 整除 当前 因数 
+ begin 
+ a [ j ]   : =   i ;   / / 存入 因数 
+ k /   : =   i ;   / / 余数 
+ i   : =   2 ;   / / 令 i 重新 等于 2 
+ j ++ ;   / / 计 数值 
+ end 
+ else 
+ begin 
+ i ++ ;   / / 不能 整除 则 当前 因数 为 非 质因数 
+ end ; 
+ end ; 
+ ( *   C2PAS :   Exit   * )   Result   : =   0 ; 
+ end ; 
+ ( *   用 for 实现 上面 的 函数 
+ int   fjzys ( int   k ) 
+ { 
+ int   i = 2 ; 
+ for   (   ;   i < = k   ;   i ++   )   / / 当 因数 i < = k 时 ， 实现 该 循环 ， 每次 循环 因数 i 自加 1 
+ for   (   ;   k% i = = 0   ;   j ++   )   / / 当 k 整除 当前 因数 ， 实现 该 循环 ， 每次 循环 下标 j 自加 1 
+ { 
+ k / = i ;   / / 使 k = k / i 
+ a [ j ] = i ;   / / 存入 因数 
+ } 
+ return   0 ; 
+ } 
+ 解决 上面 的 函数 ， 无法 输出 ， 多个 相同 的 质因数 ， 如 90 = 2 * 3 * 3 * 5 ， 只能 输出 一个 3 . 
+ * ) 
+ void   main ( ) 
+ begin 
+ printf ( ' 请 输入 一个 整数 ' # 10 ' k = ' ) ; 
+ scanf ( ' % d ' ,   ( *   C2PAS :   RefOrBit ?   * ) & m ) ; 
+ fjzys ( m ) ; 
+ for ( b   : =   0 ; b < ( j - 1 ) ; b ++ )   / / * 比 质因数 少 一个 
+ begin 
+ printf ( ' % d ' , a [ b ] ) ; 
+ printf ( ' * ' ) ; 
+ end ; 
+ printf ( ' % d ' # 10 ' ' , a [ j - 1 ] ) ;   / / 输出 最后 一个 质因数 
+ end ; 
+ 实现 一 ， 此 代码 因为 用 了 long   long   int ， 为 C99 标准 ， 故 不可 在 VC6.0 上 运行 。 　 　 
+ 实现 二 
+ 可 直接 在 VC6.0 运行 。 
+ ( defun   is - prime - number   ( number ) 　 　 ( let   ( ( num   number ) ) 　 　 ( do   ( ( index   2   （ 1 +   index ) ) ) 　 　 ( ( > =   index   num )   t ) 　 　 ( if   ( =   0   ( mod   num   index ) ) 　 　 ( return - from   is - prime - number   nil ) ) ) ) ) 　 　 ( defun   decomposition - quality - factor   ( number ) 　 　 ( let   ( ( num   number )   ( prime - list   ( make - array   10   : fill - pointer   0   : adjustable   t ) ) ) 　 　 ( if   ( is - prime - number   num ) 　 　 ( progn 　 　 ( format   t   " ~ a ~ % "   num ) 　 　 ( return - from   decomposition - quality - factor   nil ) ) ) 　 　 ( do   ( ( index   2   （ 1 +   index ) ) ) 　 　 ( ( > =   index   num )   nil ) 　 　 ( if   ( is - prime - number   index ) 　 　 ( push   index   prime - list ) ) ) 　 　 ( dolist   ( value   prime - list ) 　 　 ( let   ( ( test - flag   nil ) ) 　 　 ( do   ( ) 　 　 ( test - flag   nil ) 　 　 ( if   ( =   0   ( mod   num   value ) ) 　 　 ( progn 　 　 ( format   t   " ~ a ~ % "   value ) 　 　 ( setf   num   ( /   num   value ) ) 　 　 ( if   ( is - prime - number   num ) 　 　 ( progn 　 　 ( format   t   " ~ a ~ % "   num ) 　 　 ( return - from   decomposition - quality - factor   nil ) ) ) ) 　 　 ( setf   test - flag   t ) ) ) ) ) ) ) 
+ # ! / usr / bin / bash 
+ read   input 
+ factor   " $ input " 
+ 
