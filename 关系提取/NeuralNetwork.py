@@ -39,12 +39,13 @@ class NeuralNetwork():
 
             self.loadConceptOrder()
             self.preprocess()
-            for i in range(0, repeat):
-                self.iterate_index = i
-                self.sampling()
-                self.prepare_Variable()
-                self.train()
-                self.first_train = False
+            self.prepare_Variable()
+            # for i in range(0, repeat):
+            #     self.iterate_index = i
+            #     self.sampling()
+            #     self.prepare_Variable()
+            #     self.train()
+            #     self.first_train = False
             self.verifyTrainResult()
         else:
             self.doc2vec_model_path = doc2vec_model_path
@@ -52,8 +53,8 @@ class NeuralNetwork():
             self.concept_group_path = concept_group_path
 
             self.loadConceptOrder()
-            # self.discoverGlobalRelation()
-            self.discoverGroupRelation()
+            self.discoverGlobalRelation()
+            # self.discoverGroupRelation()
 
     def discoverGroupRelation(self):
         # load the concept group
@@ -107,7 +108,7 @@ class NeuralNetwork():
         for i in range(0, len(self.concept_order)):
             # just consider the next len(self.concept_order) / 5 concepts
             # for j in range(i + 1, len(self.concept_order)):
-            for j in range(i + 1, int(min(i + 7, len(self.concept_order)))):
+            for j in range(i + 1, len(self.concept_order)):
                 x1.append(docModel.docvecs[i])
                 x2.append(docModel.docvecs[j])
                 l1.append(self.concept_order[i])
@@ -122,7 +123,7 @@ class NeuralNetwork():
         for y in y_pred.data:
             if y[0] > 0.5:
                 relation_number += 1
-                print(l1[index], " ", l2[index])
+                print(y[0],l1[index], " ", l2[index])
             index += 1
         print(relation_number)
 
@@ -251,24 +252,32 @@ class NeuralNetwork():
         # model_object.load_state_dict(torch.load('model_parameters.pkl'))
 
     def verifyTrainResult(self):
-        model = OneLayerNet(self.D_in)
+        model = OneLayerNet(self.D_in).cuda()
         model.load_state_dict(torch.load('model_parameters.pkl'))
 
         #  predicate relations from x1 and x2
         y_pred = model(self.vx1, self.vx2)
 
+        # index = 0
+        # error = 0.0
+        # for y in y_pred.data:
+        #     if (y[0] > 0.5 and self.y[index] < 0.5):
+        #         print(y[0], self.concept_order[self.x1_index[index]], self.concept_order[self.x2_index[index]])
+        #         error += 1
+        #     if (y[0] <= 0.5 and self.y[index] > 0.5):
+        #         print(y[0], self.concept_order[self.x1_index[index]], self.concept_order[self.x2_index[index]])
+        #         error += 1
+        #     index += 1
+        # print("accurancy:", (index - error) / index)
+
         index = 0
-        error = 0.0
+        positive = 0
         for y in y_pred.data:
-            if (y[0] > 0.5 and self.y[index] == "2"):
-                print(y[0], self.concept_order[self.x1_index[index]], self.concept_order[self.x2_index[index]])
-                error += 1
-            if (y[0] <= 0.5 and self.y[index] == "1"):
-                print(y[0], self.concept_order[self.x1_index[index]], self.concept_order[self.x2_index[index]])
-                error += 1
-            index += 1
-        print("accurancy:", (index - error) / index)
+            if y[0] >0.5:
+                print(self.concept_order[self.x1_index[index]], self.concept_order[self.x2_index[index]])
+                positive += 1
+            index +=1
+        print(positive)
 
-
-NeuralNetwork(isTrain=True, D_in=25, sample_rate=3, iterate=2000000, repeat=2)
+NeuralNetwork(isTrain=False, D_in=25, sample_rate=3, iterate=2000000, repeat=2)
 # NeuralNetwork(isTrain=False, D_in=25)

@@ -38,7 +38,7 @@ def getMainContentBegin(soup):
     return catalog
 
 
-# 传入百科页面源码，解析百度百科，将所有的一级标题下的内容分开存，并返回一级标题
+# 传入百科词条，解析百度百科，将所有的一级标题下的内容分开存，并返回一级标题
 def parseContent(bikeword):
     titleSet = set()
     html = getBikePage(bikeword)
@@ -55,3 +55,22 @@ def parseContent(bikeword):
         node = node.find_next_sibling()
     return titleSet, content
 
+
+# 传入百科词条，解析该百科中所有外链百科词条
+def parseOutLinkFromContent(bikeword):
+    outLinkBikewords = set()
+
+    html = getBikePage(bikeword)
+    soup = BeautifulSoup(html, "lxml")
+    node = getMainContentBegin(soup).find_next_sibling()
+    while (node != None):
+        if 'class' in node.attrs and "para" in node.attrs['class']:
+            for a in node.find_all("a", href=True):
+                outLinkBikewords.add(a.text)
+        node = node.find_next_sibling()
+
+    return outLinkBikewords
+
+# titleet, content = parseContent("相反数")
+# print(content)
+parseOutLinkFromContent("相反数")
