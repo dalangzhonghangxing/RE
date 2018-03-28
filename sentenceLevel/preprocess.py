@@ -185,11 +185,52 @@ def split_related_and_unrelated_pairs(knowledge_pairs_path="knowledge_pairs.txt"
     Utils.writeFile("../sentenceLevelData/candidate_pairs.txt", related_pairs_content)
     Utils.writeFile("../sentenceLevelData/unrelated_pairs.txt", unrelated_pairs_content)
 
+
+##
+# Delete the specified pairs
+def delete_unrelated_pairs_from_labeled_pairs(labeled_pairs_path="../sentenceLevelData/labeled_pairs.txt",
+                                              delete_file_path="../sentenceLevelData/删除.txt"):
+    content = ""
+    # load pairs which should be deleted
+    delete_pairs = []
+    for line in open(delete_file_path, "r", encoding="utf-8"):
+        delete_pairs.append(line.replace("\n", ""))
+
+    for line in open(labeled_pairs_path, "r", encoding="utf-8"):
+        values = line.replace("\n", "").split(" ")
+        if values[0] not in delete_pairs and values[1] not in delete_pairs:
+            content += line
+
+    Utils.writeFile("../sentenceLevelData/processed_labeled_pairs.txt", content)
+
+
+def label_sentences(dataset_path="../sentenceLevelData/dataset_one_hop.txt",
+                    labeled_pairs_path="../sentenceLevelData/processed_labeled_pairs.txt"):
+    pairs_dict = {}
+    content = ""
+    for line in open(labeled_pairs_path, "r", encoding="utf-8"):
+        values = line.replace("\n", "").split(" ")
+        pairs_dict[values[0] + " " + values[1]] = values[2]
+
+    for line in open(dataset_path, "r", encoding="utf-8"):
+        values = line.replace("\n", "").split(" ")
+        key = values[1] + " " + values[2]
+        if key not in pairs_dict.keys():
+            continue
+        label = pairs_dict[values[1] + " " + values[2]]
+        if label != None:
+            content += values[0] + " " + values[1] + " " + values[2] + " " + label + "\n"
+
+    Utils.writeFile("../sentenceLevelData/labeled_sentence.txt", content)
+
+
 # extract_sentences("../bikewordContent", "one_hop_knowledges.txt")
 # crawl_bikewords_according_existing_knowledge("知识点目录顺序.txt")
-# crawl_bikecontent_and_generate_knowledge_set("error_1.txt")
+# crawl_bikecontent_and_generate_knowledge_set("bikewords.txt")
 # train_word2vec("../bikewordContent")
 # model = Word2Vec.load("one_hop_model.txt")
-# print(model.similarity('圆', '平行'))
+# print(model.similarity('圆', '直角三角形'))
 # extract_knowledge_pair_from_dataset("dataset_one_hop.txt")
-split_related_and_unrelated_pairs()
+# split_related_and_unrelated_pairs()
+# delete_unrelated_pairs_from_labeled_pairs()
+label_sentences()
