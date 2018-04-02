@@ -1,7 +1,9 @@
 import nltk
 from nltk.parse import stanford
 import jieba
-import os
+import pandas as pa
+import numpy as np
+from collections import Counter
 
 
 # 将句子进行pos标注，并生成dependency tree
@@ -23,18 +25,37 @@ class PreParse():
 
     def pos_tag(self):
         self.load_sentence()
+        types = []
         res = nltk.pos_tag_sents(self.sentences)
-        for sr in res:
-            print(sr)
+        for sentence in res:
+            for item in sentence:
+                types.append(item[1])
+        print(Counter(types))
+        # one_hot = self.one_hot(item[1])
+        # print(np.sum(one_hot == 1), one_hot)
+        # types.add(item[1])
+        # print(types)
 
     def generate_dependency_tree(self):
         self.load_sentence()
         for sentence in self.sentences:
             res = list(self.parser.parse(sentence))
-            print(res)
+            for item in res:
+                print(item)
+
+    def one_hot(self, label):
+        total_labels = ['CD', "''", 'VB', '$', 'DT', ')', '(', 'NNS', 'VBN', 'PRP', 'POS', 'MD', 'CC', 'FW', ':', 'VBZ',
+                        'RB', '.', 'UH', 'NNPS', ',', 'PDT', 'NNP', 'VBP', 'LS', 'TO', 'SYM', 'VBD', 'JJ', 'IN', 'NN']
+        one_hot = np.zeros((len(total_labels) + 1,), dtype=np.float)
+        if label not in total_labels:
+            one_hot[-1] = 1
+        else:
+            one_hot[total_labels.index(label)] = 1
+        return one_hot
 
 
 # nltk.download('averaged_perceptron_tagger')
 pos = PreParse("../sentenceLevelData/labeled_sentence.txt")
-pos.generate_dependency_tree()
+pos.pos_tag()
+# pos.generate_dependency_tree()
 # stanford.StanfordParser
