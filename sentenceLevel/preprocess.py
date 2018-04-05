@@ -11,6 +11,7 @@ from sentenceLevel.auto_label import AutoLabel
 class Sentences(object):
     def __init__(self, dirname):
         self.dirname = dirname
+        jieba.load_userdict("wordBase.txt")
 
     def __iter__(self):
         for fname in os.listdir(self.dirname):
@@ -227,10 +228,11 @@ def label_sentences(dataset_path="../sentenceLevelData/dataset_one_hop.txt",
 # extract_sentences("../bikewordContent", "one_hop_knowledges.txt")
 # crawl_bikewords_according_existing_knowledge("知识点目录顺序.txt")
 # crawl_bikecontent_and_generate_knowledge_set("bikewords.txt")
-# train_word2vec("../bikewordContent")
+train_word2vec("../bikewordContent")
 # model = Word2Vec.load("one_hop_model.txt")
+# print(model['直角三角形'])
 # print(model.similarity('圆', '直角三角形'))
 # extract_knowledge_pair_from_dataset("dataset_one_hop.txt")
 # split_related_and_unrelated_pairs()
 # delete_unrelated_pairs_from_labeled_pairs()
-label_sentences()
+# label_sentences()
