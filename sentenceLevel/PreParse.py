@@ -5,7 +5,6 @@ import numpy as np
 from collections import Counter
 from gensim.models import Word2Vec
 from multiprocessing import cpu_count
-import threading
 import Utils
 from sentenceLevel.mutiple_thread import myThread
 
@@ -15,9 +14,10 @@ class PreParse():
     def __init__(self, dataset_path):
         jieba.load_userdict("wordBase.txt")
         self.dataset_path = dataset_path
-        self.parser = stanford.StanfordParser(path_to_jar=u"/Users/hang/nlp/stanford-parser.jar",
-                                              path_to_models_jar=u"/Users/hang/nlp/stanford-parser-3.9.1-models.jar",
-                                              model_path=u'/Users/hang/nlp/chinesePCFG.ser.gz')
+        self.parser = stanford.StanfordParser(
+            path_to_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser.jar",
+            path_to_models_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser-3.9.1-models.jar",
+            model_path=u'/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/chinesePCFG.ser.gz')
         self.load_sentence()
         self.load_word2vec_model()
 
@@ -39,17 +39,17 @@ class PreParse():
             else:
                 print(line)
 
-    def pos_tag(self):
-        types = []
-        res = nltk.pos_tag_sents(self.sentences)
-        for sentence in res:
-            for item in sentence:
-                types.append(item[1])
-        print(Counter(types))
-        # one_hot = self.one_hot(item[1])
-        # print(np.sum(one_hot == 1), one_hot)
-        # types.add(item[1])
-        # print(types)
+    # def pos_tag(self):
+    #     types = []
+    #     res = nltk.pos_tag_sents(self.sentences)
+    #     for sentence in res:
+    #         for item in sentence:
+    #             types.append(item[1])
+    #     print(Counter(types))
+    #     # one_hot = self.one_hot(item[1])
+    #     # print(np.sum(one_hot == 1), one_hot)
+    #     # types.add(item[1])
+    #     # print(types)
 
     def mutiple_thread(self):
         length = len(self.sentences)
@@ -77,10 +77,11 @@ class PreParse():
                 for item in res:
                     SDP_POS = self.get_SDP(item, self.target_pairs[i][0], self.target_pairs[i][1])
                     sentence_feature = []  # 每句话的特征
-                    for node in SDP_POS:
+                    for index, node in enumerate(SDP_POS):
                         one_hot = self.one_hot(node[1])
                         word2vec = self.word2vec_model[node[0]]
-                        feature = np.hstack((word2vec, one_hot))
+                        relative_position = (index + 1) / len(SDP_POS)  # 相对位置,取值在0-1之间
+                        feature = np.hstack((word2vec, one_hot, relative_position, self.labels[i]))
                         sentence_feature.append(feature)
                     feature_matrix.append(sentence_feature)
             except:
