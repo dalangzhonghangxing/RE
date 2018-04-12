@@ -53,7 +53,7 @@ class PreParse():
 
     def mutiple_thread(self):
         length = len(self.sentences)
-        thread_numbers = cpu_count()
+        thread_numbers = cpu_count()-2
         step = length // thread_numbers
         for i in range(thread_numbers - 1):
             t = myThread("thread" + str(i), self.generate_sentences_feature_matrix, i * step, (i + 1) * step - 1)
@@ -81,8 +81,9 @@ class PreParse():
                         one_hot = self.one_hot(node[1])
                         word2vec = self.word2vec_model[node[0]]
                         relative_position = (index + 1) / len(SDP_POS)  # 相对位置,取值在0-1之间
-                        feature = np.hstack((word2vec, one_hot, relative_position, self.labels[i]))
+                        feature = np.hstack((word2vec, one_hot, relative_position))
                         sentence_feature.append(feature)
+                    sentence_feature.append(self.labels[i])
                     feature_matrix.append(sentence_feature)
             except:
                 error_sentences_index += str(i) + " "
