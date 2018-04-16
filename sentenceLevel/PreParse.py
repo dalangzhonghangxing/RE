@@ -1,12 +1,11 @@
-import nltk
 from nltk.parse import stanford
 import jieba
 import numpy as np
-from collections import Counter
 from gensim.models import Word2Vec
 from multiprocessing import cpu_count
 import Utils
 from sentenceLevel.mutiple_thread import myThread
+import os
 
 
 # 将句子进行pos标注，并生成dependency tree
@@ -14,12 +13,12 @@ class PreParse():
     def __init__(self, dataset_path):
         jieba.load_userdict("wordBase.txt")
         self.dataset_path = dataset_path
-        self.parser = stanford.StanfordParser(
-            path_to_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser.jar",
-            path_to_models_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser-3.9.1-models.jar",
-            model_path=u'/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/chinesePCFG.ser.gz')
-        self.load_sentence()
-        self.load_word2vec_model()
+        # self.parser = stanford.StanfordParser(
+        #     path_to_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser.jar",
+        #     path_to_models_jar=u"/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/stanford-parser-3.9.1-models.jar",
+        #     model_path=u'/home/hang/PycharmProjects/ykyl/experiment_enviroment/sentenceLevel/chinesePCFG.ser.gz')
+        # self.load_sentence()
+        # self.load_word2vec_model()
 
     def load_word2vec_model(self):
         self.word2vec_model = Word2Vec.load("one_hop_model.txt")
@@ -53,7 +52,7 @@ class PreParse():
 
     def mutiple_thread(self):
         length = len(self.sentences)
-        thread_numbers = cpu_count()-2
+        thread_numbers = cpu_count() - 2
         step = length // thread_numbers
         for i in range(thread_numbers - 1):
             t = myThread("thread" + str(i), self.generate_sentences_feature_matrix, i * step, (i + 1) * step - 1)
@@ -132,9 +131,24 @@ class PreParse():
             one_hot[total_labels.index(label)] = 1
         return one_hot
 
+    def merge_feature_matrix(self, step):
+        i = 0
+        file_path = "../sentenceLevelData/"
+        feature_matrix = []
+        feature_matrix = np.array(feature_matrix)
+        while True:
+            begin = i * step
+            i += 1
+            path = file_path + "feature_matrix" + str(begin) + ".txt.npy"
+            if os.path.exists(path) == False:
+                break
+            sentence_feature = np.load(path)
+            sentence_feature.shape
+
 
 # nltk.download('averaged_perceptron_tagger')
 pos = PreParse("../sentenceLevelData/labeled_sentence.txt")
 # pos.pos_tag()
-pos.mutiple_thread()
+# pos.mutiple_thread()
 # stanford.StanfordParser
+pos.merge_feature_matrix(433)
